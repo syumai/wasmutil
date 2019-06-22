@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Go wasm example</title>
+  </head>
+  <body>
+    <form id="fileForm" action="#">
+      <input type="file" name="file" />
+      <button>Read file from Go (See console)</button>
+    </form>
+
+    <script src="./wasm_exec.js"></script>
+    <script src="./js/io.js"></script>
+    <script>
+      (async () => {
+        const go = new Go();
+        const { instance } = await WebAssembly.instantiateStreaming(
+          fetch('main.wasm'),
+          go.importObject
+        );
+        await go.run(instance);
+      })();
+    </script>
+    <script>
+      const fileForm = document.getElementById('fileForm');
+      const fileField = fileForm.children.file;
+      fileForm.addEventListener('submit', async e => {
+        e.preventDefault();
+        if (fileField.files.length < 1) {
+          return;
+        }
+        const file = fileField.files[0];
+        window.readAll(file);
+      });
+    </script>
+  </body>
+</html>
