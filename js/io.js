@@ -10,10 +10,7 @@ class ArrayReader {
 
   read(buf) {
     if (!buf) {
-      return {
-        eof: true,
-        nread: 0,
-      };
+      buf = [];
     }
 
     const restLen = this.length - this.pos;

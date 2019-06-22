@@ -1,10 +1,7 @@
 // This doesn't work on go 1.12.6
 Blob.prototype.read = async function(buf) {
   if (!buf) {
-    return {
-      eof: true,
-      nread: 0,
-    };
+    buf = [];
   }
   const pos = this.pos || 0;
   const { size: thisLen } = this;
