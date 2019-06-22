@@ -1,43 +1,40 @@
-Blob.prototype.read = async function(buf) {
-  if (!buf) {
+class ArrayReader {
+  constructor(ary) {
+    this.ary = ary;
+    this.pos = 0;
+  }
+
+  get length() {
+    return this.ary.length;
+  }
+
+  read(buf) {
+    if (!buf) {
+      return {
+        eof: true,
+        nread: 0,
+      };
+    }
+
+    const restLen = this.length - this.pos;
+
+    let nread, eof;
+    if (buf.length > restLen) {
+      nread = restLen;
+      eof = true;
+    } else {
+      nread = buf.length;
+      eof = false;
+    }
+
+    for (let i = 0; i < nread; i++) {
+      buf[i] = this.ary[i + this.pos];
+    }
+    this.pos = this.pos + nread;
+
     return {
-      eof: true,
-      nread: 0,
+      nread,
+      eof,
     };
-  }
-  const pos = this.pos || 0;
-  const { size: thisLen } = this;
-  const restLen = thisLen - pos;
-
-  const { length: bufLen } = buf;
-  let b, nread, eof;
-  if (bufLen > restLen) {
-    b = this.slice(pos, thisLen);
-    nread = restLen;
-    eof = true;
-  } else {
-    b = this.slice(pos, pos + bufLen);
-    nread = bufLen;
-    eof = false;
-  }
-
-  const fileReader = new FileReader();
-  const p = new Promise(resolve => {
-    fileReader.addEventListener('load', () => {
-      resolve();
-    });
-  });
-  fileReader.readAsArrayBuffer(b);
-  await p;
-
-  const data = new Uint8Array(fileReader.result);
-  for (let i = 0; i < nread; i++) {
-    buf[i] = data[i];
-  }
-  this.pos = pos + nread;
-
-  return {
-    nread,
-    eof,
   };
-};
+}

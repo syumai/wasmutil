@@ -10,7 +10,7 @@
     </form>
 
     <script src="./wasm_exec.js"></script>
-    <script src="./js/io.js"></script>
+    <script src="js/io.js"></script>
     <script>
       (async () => {
         const go = new Go();
@@ -30,7 +30,16 @@
           return;
         }
         const file = fileField.files[0];
-        window.readAll(file);
+        const reader = new FileReader();
+        const p = new Promise(resolve => {
+          reader.addEventListener('load', () => {
+            resolve();
+          })
+        });
+        reader.readAsArrayBuffer(file);
+        await p;
+        const data = new Uint8Array(reader.result);
+        window.readAll(new ArrayReader(data));
       });
     </script>
   </body>
